@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>贪吃蛇1.0</title>
+		<style type="text/css">
+			*{padding: 0 ;margin: 0;}
+			body {height: 100vh;overflow: hidden;}
+			#tou {width: 10px;height: 10px;background-color: #FF0000;position: absolute;left: 200px;top: 50px;}
+			ul li {list-style-type: none;width: 10px;height: 10px;background-color: #000000;position: absolute;left: 190px;top: 50px;}
+			#div2 {width: 10px;height: 10px;background-color: #0077AA;position: absolute;}
+			#record {width: 200px;background-color: salmon;float: right;text-align: center;line-height: 200px;font-size: larger;}
+		</style>
+		<script type="text/javascript">
+			window.onload=function()
+			
+			{
+				var oRecord=document.getElementById('record')
+				var oDiv=document.getElementById('tou')
+				oRecord.style.height=document.documentElement.clientHeight+'px'
+				
+			 	function follow()
+			    {
+				  var lis=document.getElementsByTagName('li')
+				  for(let i=lis.length-1;i>0;i--)
+				  {
+					lis[i].style.left=lis[i-1].offsetLeft+'px'
+				 	lis[i].style.top=lis[i-1].offsetTop+'px'
+				  }
+			    }
+				
+					// var timer1
+					// timer1=setInterval(follow,50)
+
+		  var downCount=0
+			
+			document.onkeydown=function(ev)
+			{
+				downCount++
+				if(downCount==1){
+					var timer1
+					timer1=setInterval(follow,50)
+				}
+				
+				function getStyle(obj,name)
+				{
+					if(obj.currentStyle)
+					{return obj.currentStyle[name]}
+					else
+					{return getComputedStyle(obj,false)[name]}
+				}
+				
+				function startMove(obj,json,end)
+				{
+						clearInterval(obj.timer)
+					    obj.timer=setInterval(function(){
+						var jiashe=true;
+						for(var attr in json)
+						{   
+						                                    // 就会出错！
+						var cur=parseInt(getStyle(obj,attr))
+						if(cur<json[attr])                          
+						{speed=1}
+						else
+						{speed=-1}
+						
+						if(cur!=json[attr]) //但凡有一个人没到的话 假设都是false
+						{jiashe=false}
+				
+						obj.style[attr]=cur+speed+'px'
+				
+					    }  	
+						if(jiashe)
+						{
+							if(end) end();
+							clearInterval(obj.timer)
+						}
+						},1)
+				
+				}
+				
+				var oDiv=document.getElementById('tou')
+				var lis=document.getElementsByTagName('li')
+				var oEvent=ev||event
+				var timer
+				
+				if(oEvent.keyCode==37) //左上右下 成键盘顺时针
+				{
+					clearTimeout(timer)
+					startMove(oDiv,{left:-100})
+					function zuoyi()
+					{
+						if(oDiv.offsetLeft<-10)
+						{oDiv.style.left=document.documentElement.clientWidth-200-10+'px'}
+					}
+					timer=setInterval(zuoyi,100)
+			
+				}
+				if(oEvent.keyCode==38)
+				{
+					clearTimeout(timer)
+					startMove(oDiv,{top:-100})
+					function shangyi()
+					{
+						if(oDiv.offsetTop<-10)
+						{oDiv.style.top=document.documentElement.clientHeight-10+'px'}
+					}
+					timer=setInterval(shangyi,100)
+				}
+				if(oEvent.keyCode==39)
+				{ 
+					clearTimeout(timer)
+					startMove(oDiv,{left:document.documentElement.clientWidth+100})
+					function youyi()
+					{
+						if(oDiv.offsetLeft>document.documentElement.clientWidth-200)
+						{oDiv.style.left=10+'px'}
+					}
+					timer=setInterval(youyi,100)
+				}
+				if(oEvent.keyCode==40)
+				{
+					clearTimeout(timer)
+					startMove(oDiv,{top:document.documentElement.clientHeight+100})
+					function xiayi()
+					{
+						if(oDiv.offsetTop>document.documentElement.clientHeight+10)
+						{oDiv.style.top=10+'px'}
+					}
+					timer=setInterval(xiayi,100)
+				}
+				
+			
+				
+			}}
+		</script>
+	</head>
+	<body style="height: 100%;">
+		<ul id="father" >
+			<li id="tou"></li>
+			<li></li>
+			<li style="position: absolute;left: 180px;top: 50px;"></li>
+		</ul>
+		<div id="div2"></div>
+		<section id="record">得分为<span id="score"></span></section>
+	</body>
+</html>
+
+<script type="text/javascript">
+	var oUl=document.getElementById('father')
+	var oDiv1=document.getElementById('tou')
+	var oDiv2=document.getElementById('div2')
+	var oScore=document.getElementById('score')
+	
+	
+	var timer2
+	var timer5
+	var score=0
+	
+	function random()
+	{
+		var num1=Math.floor(Math.random()*(document.documentElement.clientWidth-10-200))
+		var num2=Math.floor(Math.random()*(document.documentElement.clientHeight-20))  
+		oDiv2.style.left=num1+'px'
+		oDiv2.style.top=num2+'px'
+	}
+	random();
+	
+	function comparePostion()
+	{
+		var deltaLeft=Math.abs(oDiv2.offsetLeft-oDiv1.offsetLeft)
+		var deltaHeight=Math.abs(oDiv2.offsetTop-oDiv1.offsetTop)
+		
+		if(deltaHeight<8&&deltaLeft<8)
+		{
+			random();
+			score=score+1
+			var oLi=document.createElement('li')
+			oUl.appendChild(oLi)
+			oScore.innerHTML=score
+		}
+		
+	
+	}
+	function loss()
+	{
+		var lis=document.getElementsByTagName('li')
+		var oDiv1=document.getElementById('tou')
+		for(var i=lis.length-1;i>1;i--)               //这个循环巧妙的就是避开跟第二个结块相撞的情况 因为不会跟第二个撞
+		{
+			var dLeft=Math.abs(oDiv1.offsetLeft-lis[i].offsetLeft)
+			var dHeight=Math.abs(oDiv1.offsetTop-lis[i].offsetTop)
+			if((dLeft>=0&&dLeft<=5)&&(dHeight>=0&&dHeight<=5))
+			{alert('you have lost'+'你的得分为'+score)}
+		}
+
+	}	
+	
+	
+	timer2=setInterval(comparePostion,1)
+	// function Xloss()
+	// {
+	// 	timer5=setInterval(loss,5)
+	// }
+	timer5=setInterval(loss,5)
+	// var timer8=setTimeout(Xloss,5000)
+	oScore.innerHTML=score
+	
+</script>
